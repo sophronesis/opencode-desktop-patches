@@ -33,10 +33,12 @@ spinner verbs:
 - sidebar inbox rows: `Vibecoding 12s` instead of `Working {{duration}}`
   (verbs truncated to 20 chars)
 
-The verb rotates every 8s via a module-level tick signal. It is derived from
-the tick counter (multiplicative hash), not `Math.random()`, so the inbox row
-- which re-renders every second for the elapsed counter - keeps the same verb
-within an 8s window instead of flickering.
+The verb rotates every 8s via a module-level tick signal. `createSpinnerVerb()`
+gives every call site its own random salt mixed into the tick counter
+(multiplicative hash), so the timeline and each sidebar row show **different**
+verbs while all of them rotate together per 8s window. The salt is picked at
+mount, not per render: the inbox row re-renders every second for the elapsed
+counter, so per-render randomness would flicker.
 
 - files: `packages/app/src/session/spinner-verbs.ts` (new, 109 verbs verbatim
   from [Castrozan's spinner-verbs.nix](https://github.com/Castrozan/.dotfiles/blob/main/agent-harness/harnesses/claude-code/settings/spinner-verbs.nix)),
