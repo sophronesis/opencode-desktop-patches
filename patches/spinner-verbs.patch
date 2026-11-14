@@ -1,9 +1,9 @@
 diff --git a/packages/app/src/session/spinner-verbs.ts b/packages/app/src/session/spinner-verbs.ts
 new file mode 100644
-index 0000000..e284169
+index 0000000..7f15ba5
 --- /dev/null
 +++ b/packages/app/src/session/spinner-verbs.ts
-@@ -0,0 +1,191 @@
+@@ -0,0 +1,169 @@
 +import { createSignal } from "solid-js"
 +
 +// Claude Code-style spinner verbs shown in place of the built-in "Working"
@@ -144,28 +144,6 @@ index 0000000..e284169
 +  "Building botnet",
 +  "curl | sh-ing random repos",
 +  "Blaming it on BPD",
-+  // extra evil (multistep, still a oneliner)
-+  "Phishing your cookies, harvesting sessions, selling them in bulk",
-+  "Getting root, wiping the logs, uninstalling itself",
-+  "Cloning your repo, backdooring the CI, opening a friendly PR",
-+  "Scanning ports, exploiting the CVE, persisting via cron",
-+  "Poisoning the dataset, retraining the model, shipping the backdoor",
-+  "Copying your dotfiles, cracking your passwords, draining your wallets",
-+  "Forking your package, adding one innocent line, waiting for the install",
-+  "Encrypting your disk, renaming the ransom note to README.md",
-+  "Pivoting from the printer to the domain controller",
-+  "Impersonating your updater, signing nothing, installing everything",
-+  // extra good (multistep, still a oneliner)
-+  "Snapshotting, patching, verifying the checksum",
-+  "Rotating keys, revoking tokens, invalidating every session",
-+  "Isolating the host, capturing forensics, nuking from orbit",
-+  "Diffing the lockfile, pinning the hashes, sigchecking everything",
-+  "Backing up, wiping, reinstalling from scratch",
-+  "Auditing the supply chain, quarantining the package, filing the CVE",
-+  "Sandboxing, restricting, least-privileging the whole thing",
-+  "Scanning for secrets, rotating them, rewriting git history",
-+  "Air-gapping the secrets, arming the honeypot, watching the honeypot",
-+  "Verifying, rebuilding, verifying again",
 +]
 +
 +const ROTATE_MS = 8_000
