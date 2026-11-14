@@ -1,9 +1,9 @@
 diff --git a/packages/app/src/session/spinner-verbs.ts b/packages/app/src/session/spinner-verbs.ts
 new file mode 100644
-index 0000000..7f15ba5
+index 0000000..efca0d0
 --- /dev/null
 +++ b/packages/app/src/session/spinner-verbs.ts
-@@ -0,0 +1,169 @@
+@@ -0,0 +1,174 @@
 +import { createSignal } from "solid-js"
 +
 +// Claude Code-style spinner verbs shown in place of the built-in "Working"
@@ -144,6 +144,11 @@ index 0000000..7f15ba5
 +  "Building botnet",
 +  "curl | sh-ing random repos",
 +  "Blaming it on BPD",
++  "Dronestrikeing",
++  "Generating porn with midgets",
++  "Weaponizing nostalgia",
++  "Masking corruption as lobbying",
++  "Accelerating Kestler's syndrome",
 +]
 +
 +const ROTATE_MS = 8_000
