@@ -1,0 +1,69 @@
+diff --git a/packages/session-ui/src/components/basic-tool.tsx b/packages/session-ui/src/components/basic-tool.tsx
+index 22f5672..43a204b 100644
+--- a/packages/session-ui/src/components/basic-tool.tsx
++++ b/packages/session-ui/src/components/basic-tool.tsx
+@@ -350,9 +350,29 @@ function args(input: GenericToolInput | undefined) {
+     .slice(0, 3)
+ }
+ 
+-export function GenericTool(props: { tool: string; status?: string; hideDetails?: boolean; input?: GenericToolInput }) {
++export function GenericTool(props: {
++  tool: string
++  status?: string
++  hideDetails?: boolean
++  input?: GenericToolInput
++  output?: string
++}) {
+   const i18n = useI18n()
+ 
++  // Plugin and MCP tools have no registered renderer, so this body is the only place their full
++  // input and output are visible. Values render raw; structured values fall back to JSON.
++  const inputBody = createMemo(() => {
++    const entries = Object.entries(props.input ?? {})
++
++    if (entries.length === 0) return undefined
++
++    return entries
++      .map(([key, value]) => `${key}: ${typeof value === "string" ? value : JSON.stringify(value, null, 2)}`)
++      .join("\n\n")
++  })
++
++  const outputBody = () => (props.output ?? "").trim() || undefined
++
+   return (
+     <BasicTool
+       icon="mcp"
+@@ -363,6 +383,32 @@ export function GenericTool(props: { tool: string; status?: string; hideDetails?
+         args: args(props.input),
+       }}
+       hideDetails={props.hideDetails}
+-    />
++      hasContent={inputBody() !== undefined || outputBody() !== undefined}
++    >
++      <div data-slot="generic-tool-body" class="flex min-w-0 flex-col gap-2">
++        <Show when={inputBody()}>
++          {(body) => (
++            <pre
++              data-slot="generic-tool-input"
++              class="m-0 max-h-72 min-w-0 overflow-auto whitespace-pre-wrap break-words font-mono text-[12px] leading-normal text-v2-text-text-faint"
++            >
++              {body()}
++            </pre>
++          )}
++        </Show>
++        <Show when={outputBody()}>
++          {(body) => (
++            <div data-slot="generic-tool-output" class="flex min-w-0 flex-col gap-1">
++              <span class="text-[12px] font-[530] leading-text-compact tracking-[-0.04px] text-v2-text-text-faint">
++                {i18n.t("ui.tool.execute.output")}
++              </span>
++              <pre class="m-0 max-h-72 min-w-0 overflow-auto whitespace-pre-wrap break-words font-mono text-[12px] leading-normal text-v2-text-text-faint">
++                {body()}
++              </pre>
++            </div>
++          )}
++        </Show>
++      </div>
++    </BasicTool>
+   )
+ }
