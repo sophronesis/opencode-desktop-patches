@@ -1,9 +1,9 @@
 diff --git a/packages/app/src/session/spinner-verbs.ts b/packages/app/src/session/spinner-verbs.ts
 new file mode 100644
-index 0000000..8d77ada
+index 0000000..c7b46b3
 --- /dev/null
 +++ b/packages/app/src/session/spinner-verbs.ts
-@@ -0,0 +1,145 @@
+@@ -0,0 +1,153 @@
 +import { createSignal } from "solid-js"
 +
 +// Claude Code-style spinner verbs shown in place of the built-in "Working"
@@ -120,6 +120,14 @@ index 0000000..8d77ada
 +  "we do a little refactoring",
 +  "hear me out. what if we just...",
 +  "anyway, so i started blasting",
++  "Pondering the orb",
++  "Segfaulting",
++  "Rewriting to rust",
++  "Redeploying with nix",
++  "Goblinmaxxing",
++  "Consulting the tarot",
++  "Macrodosing shrooms",
++  "Consulting DMT entities",
 +]
 +
 +const ROTATE_MS = 8_000
