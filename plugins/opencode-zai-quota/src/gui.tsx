@@ -58,6 +58,7 @@ export default Plugin.define({
         }
         setState("data", out)
         console.error(`[zai-quota] z.ai: ${out.windows.map((w) => `${w.name} ${w.percent}%`).join(", ") || out.error || "no windows"}`)
+        return !out.error // error output = not success: retry in 10s, not 5min
       } catch (e) {
         console.error(`[zai-quota] z.ai rpc failed: ${e instanceof Error ? e.message : String(e)}`)
         return false
@@ -75,6 +76,7 @@ export default Plugin.define({
         }
         setOrState("data", out)
         console.error(`[zai-quota] openrouter: available ${out.totalAvailable ?? "?"}${out.error ? ` error ${out.error}` : ""}`)
+        return !out.error // error output = not success: retry in 10s, not 5min
       } catch (e) {
         console.error(`[zai-quota] openrouter rpc failed: ${e instanceof Error ? e.message : String(e)}`)
         return false
@@ -179,3 +181,5 @@ export default Plugin.define({
     }
   },
 })
+
+// hot-reload nudge 2026-11-17: remount after boot-flurry stuck "?" state
