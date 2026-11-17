@@ -1,0 +1,12 @@
+{
+  "name": "opencode-session-log",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "OpenCode plugin: JSONL log of concurrent-session count changes (created/deleted/archived/busy) with session title, project, git branch, timestamp and cumulative total",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@opencode/plugin": "2.2.1"
+  }
+}

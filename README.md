@@ -1,7 +1,9 @@
 # opencode-desktop-patches
 
 Source patches against the [opencode](https://github.com/anomalyco/opencode)
-desktop monorepo. Base: tag **v2.2.1**. Apply from the monorepo root:
+desktop monorepo, plus the full plugin/widget/MCP setup that runs on top of
+it - see [INSTALL.md](INSTALL.md) for the complete install guide and
+`plugins/` for the four opencode plugins. Base: tag **v2.2.1**. Apply from the monorepo root:
 
 ```sh
 git apply --check patches/generic-tool-expandable.patch   # verify first

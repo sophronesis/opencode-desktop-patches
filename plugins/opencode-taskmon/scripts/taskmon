@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+# taskmon - publish long-running job progress for the opencode-taskmon pill.
+#
+# usage:
+#   taskmon set <id> <label> <current> <total> [state] [detail]
+#   taskmon done <id> [detail]
+#   taskmon fail <id> [detail]
+#   taskmon rm <id>
+#   taskmon list
+#
+# each job is one JSON file in ~/.local/state/taskmon/<id>.json:
+#   { id, label, current, total, state, detail, unit, startedAt, updatedAt }
+# `set` preserves startedAt/unit across updates so rate/ETA stay stable.
+# current is sampled on each update by the server for a smoothed rate.
+set -euo pipefail
+
+dir=${TASKMON_DIR:-$HOME/.local/state/taskmon}
+mkdir -p "$dir"
+
+now_ms() { date +%s%3N; }
+
+file_of() { printf '%s/%s.json' "$dir" "$(printf '%s' "$1" | tr -c 'A-Za-z0-9._-' '_')"; }
+
+get_field() { # file field default
+  jq -r --arg d "$3" --arg k "$2" '.[$k] // $d' "$1" 2>/dev/null || echo "$3"
+}
+
+write_task() { # id label current total state detail
+  local id=$1 label=$2 current=$3 total=$4 state=$5 detail=$6
+  local f
+  f=$(file_of "$id")
+  local startedAt unit
+  startedAt=$(get_field "$f" startedAt "$(now_ms)")
+  unit=$(get_field "$f" unit "${TASKMON_UNIT:-B}")
+  jq -n \
+    --arg id "$id" --arg label "$label" --arg state "$state" --arg detail "$detail" \
+    --arg unit "$unit" --argjson current "$current" --argjson total "$total" \
+    --argjson startedAt "$startedAt" --argjson updatedAt "$(now_ms)" \
+    '{id: $id, label: $label, current: $current, total: $total,
+      state: $state, detail: $detail, unit: $unit,
+      startedAt: $startedAt, updatedAt: $updatedAt}' \
+    > "$f.tmp"
+  mv "$f.tmp" "$f"
+}
+
+num_check() { # value what
+  [[ $1 =~ ^-?[0-9]+([.][0-9]+)?$ ]] || { echo "taskmon: $2 must be a number, got '$1'" >&2; exit 1; }
+}
+
+cmd=${1:-help}
+shift || true
+case $cmd in
+  set)
+    id=${1:?usage: taskmon set <id> <label> <current> <total> [state] [detail]}
+    label=${2:?usage: taskmon set <id> <label> <current> <total> [state] [detail]}
+    current=${3:?usage: taskmon set ...}
+    total=${4:?usage: taskmon set ...}
+    state=${5:-running}
+    detail=${6:-}
+    num_check "$current" current
+    num_check "$total" total
+    write_task "$id" "$label" "$current" "$total" "$state" "$detail"
+    ;;
+  done|fail)
+    id=${1:?usage: taskmon $cmd <id> [detail]}
+    detail=${2:-}
+    f=$(file_of "$id")
+    [[ -f $f ]] || { echo "taskmon: no task '$id'" >&2; exit 1; }
+    label=$(get_field "$f" label "$id")
+    current=$(get_field "$f" current 0)
+    total=$(get_field "$f" total 0)
+    write_task "$id" "$label" "$current" "$total" "$cmd" "$detail"
+    ;;
+  rm)
+    id=${1:?usage: taskmon rm <id>}
+    rm -f "$(file_of "$id")"
+    ;;
+  list)
+    for f in "$dir"/*.json; do
+      [[ -f $f ]] || continue
+      jq -r '[.state, .label, (.current|tostring), (.total|tostring),
+              ((.updatedAt/1000 | strftime("%H:%M:%S")))] | @tsv' "$f" |
+        column -t -s $'\t'
+    done
+    ;;
+  *)
+    grep '^#' "$0" | sed 's/^# \{0,1\}//'
+    ;;
+esac

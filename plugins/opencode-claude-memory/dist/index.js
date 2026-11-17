@@ -1,0 +1,10 @@
+import { createMemoryPlugin } from "./host/v1/plugin.js";
+import { createV2Setup } from "./host/v2/plugin.js";
+export const PLUGIN_ID = "opencode-claude-memory";
+export { createMemoryPlugin, createV2Setup };
+export const MemoryPlugin = createMemoryPlugin();
+export const MemorySetup = createV2Setup();
+const plugin = { id: PLUGIN_ID, server: MemoryPlugin, setup: MemorySetup };
+export default plugin;
+export { MEMORY_AGENTS, MemoryOptionsSchema } from "./config.js";
+export { MemoryStore } from "./store/MemoryStore.js";
