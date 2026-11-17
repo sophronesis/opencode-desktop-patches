@@ -47,16 +47,17 @@ counter, so per-render randomness would flicker.
   `packages/app/src/session/timeline/message-timeline.tsx`,
   `packages/app/src/shell/titlebar/inbox.tsx`
 
-## Not here
-
-A third opencode-desktop modification - telegram-blue user message bubbles -
-lives in the [nixos config](https://github.com/sophronesis/nixos)
-(`packages/opencode-desktop-generic-tool`, `packages/opencode-desktop-telegram-blue`)
-because it byte-patches the built `app.asar` at build time and is not a
-source patch.
-
-## Usage in nix
+## Nix wiring
 
 The nixos config wires these as `overrideAttrs patches` on the nixpkgs
 `opencode-desktop` 2.2.1 derivation, chained with the telegram-blue asar
-wrapper. See `package.nix` in the config repo for the wiring.
+wrapper. Vendored here under `nix/packages/` (mirrors of the config's
+`packages/` dir; patch paths adjusted):
+
+- `nix/packages/opencode-desktop-generic-tool/package.nix` - the multiverse
+  `.eval` derivation + both source patches
+- `nix/packages/opencode-desktop-telegram-blue/` - the `runCommand` wrapper
+  and `patch-telegram-blue.py` (all inputs via argv, no hardcoded paths)
+
+The config repo remains the canonical consumer - on the machine the chain is
+`(pin "opencode" "latest")` + the two `callPackage`s in `modules/pkgs.nix`.

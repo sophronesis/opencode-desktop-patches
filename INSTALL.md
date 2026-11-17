@@ -4,6 +4,7 @@ complete setup for the environment this repo exists for. reflects the fw16
 nixos machine as of 2026-11-17. repo layout:
 
 - `patches/` - source patches against the opencode desktop monorepo (see main [README](README.md))
+- `nix/` - the nix wiring that applies the patches + telegram-blue asar wrapper
 - `plugins/` - the four opencode plugins (pills/widgets included), source-only mirrors
 - `INSTALL.md` - this file
 
@@ -11,21 +12,24 @@ nixos machine as of 2026-11-17. repo layout:
 
 the desktop app is nixpkgs `opencode-desktop` 2.2.1, resolved through
 [nixpkgs-multiverse](https://github.com/fzakaria/nixpkgs-multiverse) (unstable's
-newer releases had no hydra build), then patched and wrapped in the
-[nixos config](https://github.com/sophronesis/nixos):
+newer releases had no hydra build), then patched and wrapped. the full nix
+wiring is vendored in this repo under `nix/packages/` (mirrors of the
+[nixos config](https://github.com/sophronesis/nixos) `packages/` dir,
+patch paths adjusted to `../../patches/`):
 
-- `modules/pkgs.nix`: `(pin "opencode" "latest")` for the TUI, plus the package chain:
+- `modules/pkgs.nix` in the config: `(pin "opencode" "latest")` for the TUI, plus the package chain:
   ```nix
   (callPackage ./../packages/opencode-desktop-telegram-blue/package.nix {
     opencode-desktop = callPackage ./../packages/opencode-desktop-generic-tool/package.nix { };
   })
   ```
-- `packages/opencode-desktop-generic-tool/package.nix` - applies `patches/generic-tool-expandable.patch`
+- `nix/packages/opencode-desktop-generic-tool/package.nix` - applies `patches/generic-tool-expandable.patch`
   and `patches/spinner-verbs.patch` via `overrideAttrs` on the multiverse `.eval` derivation
   (the `pin` result is a fake drv without `overrideAttrs`, hence `.eval`)
-- `packages/opencode-desktop-telegram-blue/package.nix` - copies the patched derivation and
+- `nix/packages/opencode-desktop-telegram-blue/package.nix` - copies the patched derivation and
   byte-patches `app.asar` CSS for telegram-blue user bubbles (same-length edits; the
-  derivation name must stay identical). script asserts on every anchor and fails loudly on bumps.
+  derivation name must stay identical). `patch-telegram-blue.py` asserts on every
+  anchor and fails loudly on bumps.
 
 without nixos, apply the patches to a monorepo checkout at tag v2.2.1 and build:
 
